@@ -1,6 +1,6 @@
 {
   "name": "vue-moveable-v3",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "browser": "dist/moveable.js",
   "source": "src/components/moveable/moveable.ts",
   "main": "dist/moveable.umd.js",
