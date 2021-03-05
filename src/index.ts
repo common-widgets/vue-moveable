@@ -1,7 +1,7 @@
-import Moveable from './components/moveable/Moveable.vue'
+import Movable from './components/movable/Movable.vue'
 
-export default {
-  install(app: any) {
-    app.use(Moveable)
-  }
+Movable.install = (app: any) => {
+  app.use(Movable)
 }
+
+export default Movable

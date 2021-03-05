@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 
 export const useMousePosition = () => {
   let callback
@@ -30,12 +30,14 @@ export const useMousePosition = () => {
   }
 }
 
-export const useMouseMove = (tx, ty) => {
+export const useMouseMove = (tx, ty, movable: Ref) => {
   const { x, y, onMouseMove } = useMousePosition()
   const moveData = { x: 0, y: 0, moving: false }
 
   const cx = ref(tx)
   const cy = ref(ty)
+
+  watch(movable, () => mouseUp())
 
   function mouseDown (e: MouseEvent) {
     moveData.moving = true
@@ -46,7 +48,7 @@ export const useMouseMove = (tx, ty) => {
     moveData.moving = false
   }
   onMouseMove(() => {
-    if (!moveData.moving) return
+    if (!moveData.moving || !movable.value) return
     cx.value = x.value - moveData.x
     cy.value = y.value - moveData.y
   })

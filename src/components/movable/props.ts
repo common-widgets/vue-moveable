@@ -8,6 +8,10 @@ export default {
     default: 1
   },
 
+  movable: {
+    type: Boolean,
+    default: true
+  },
   draggable: {
     type: Boolean,
     default: true

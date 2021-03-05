@@ -1,11 +1,9 @@
 {
-  "name": "vue-moveable-v3",
-  "version": "1.0.0",
-  "browser": "dist/moveable.js",
-  "source": "src/components/moveable/moveable.ts",
-  "main": "dist/moveable.umd.js",
-  "module": "dist/moveable.esm.js",
-  "unpkg": "dist/moveable.js",
+  "name": "vue-movable-v3",
+  "version": "1.0.4",
+  "source": "src/components/movable/index.ts",
+  "main": "dist/vue-movable-v3.umd.js",
+  "module": "dist/vue-movable-v3.es.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

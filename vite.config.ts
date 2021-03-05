@@ -5,10 +5,11 @@ module.exports = {
   plugins: [vue()],
   build: {
     minify: false,
-    cssCodeSplit: true,
+    cssCodeSplit: false,
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
-      name: 'VueMoveable'
+      name: 'VueMovable',
+      formats: ['es','cjs','umd', 'iife']
     },
     rollupOptions: {
       external: ['vue'],
