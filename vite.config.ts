@@ -3,6 +3,11 @@ import vue from '@vitejs/plugin-vue'
 
 module.exports = {
   plugins: [vue()],
+  resolve: {
+    alias: {
+      "vue-movable-v3": path.resolve(__dirname, "./dist"),
+    }
+  },
   build: {
     minify: false,
     cssCodeSplit: false,

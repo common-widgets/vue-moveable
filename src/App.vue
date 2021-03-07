@@ -1,29 +1,35 @@
 <template lang="pug">
 .wrapper
   .container
+    .h2(@click="onClick") test
+
     Movable(
-      :x="100" 
-      :y="200"
+      :x="50" 
+      :y="50"
+      :width="200"
       :direction="direction"
       :movable="movable")
       .h2 Box
-    Movable(
+
+    MovableT(
       :x="40"
       :y="100"
+      :width="100"
       :direction="direction"
       :movable="movable")
       .h2 Box2
-    .h2(@click="onClick") test
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import Movable from './components/movable/Movable.vue'
+import MovableT from 'vue-movable-v3/vue-movable-v3.es.js'
+import 'vue-movable-v3/style.css'
 
 export default defineComponent({
   name: 'App',
   components: {
-    Movable
+    Movable, MovableT
   },
   setup() {
     const movable = ref(true)
