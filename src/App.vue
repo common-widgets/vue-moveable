@@ -1,11 +1,19 @@
 <template lang="pug">
 .wrapper
-  Movable(
-    :x="100" 
-    :y="200"
-    :movable="movable")
-    .h2 Box
-  .h2(@click="onClick") test
+  .container
+    Movable(
+      :x="100" 
+      :y="200"
+      :direction="direction"
+      :movable="movable")
+      .h2 Box
+    Movable(
+      :x="40"
+      :y="100"
+      :direction="direction"
+      :movable="movable")
+      .h2 Box2
+    .h2(@click="onClick") test
 </template>
 
 <script lang="ts">
@@ -19,11 +27,13 @@ export default defineComponent({
   },
   setup() {
     const movable = ref(true)
+    const direction = ref('auto')
     const onClick = () => {
-      movable.value = !movable.value
+      direction.value = direction.value === 'x' ? 'y' : 'x'
     }
     return {
       movable,
+      direction,
       onClick
     }
   }
@@ -33,4 +43,11 @@ export default defineComponent({
 <style lang="stylus">
 #app
   height 100%
+
+.container
+  position relative
+  width 400px
+  height 300px
+  overflow auto
+  border 1px solid teal
 </style>

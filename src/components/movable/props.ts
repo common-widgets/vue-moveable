@@ -3,11 +3,23 @@ import { PropType } from 'vue'
 export default {
   x: Number,
   y: Number,
+  width: {
+    type: Number,
+    default: 100
+  },
+  height: {
+    type: Number,
+    default: 100
+  },
   scale: {
     type: Number,
     default: 1
   },
 
+  direction: {
+    type: String,
+    default: 'auto'
+  },
   movable: {
     type: Boolean,
     default: true
