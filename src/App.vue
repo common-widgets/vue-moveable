@@ -8,12 +8,14 @@
       :y="50"
       :width="200"
       :direction="direction"
-      :movable="movable")
+      :movable="movable"
+      :resizable="resizable")
       .h2 Box
 
     MovableT(
       :x="40"
       :y="100"
+      :scale="1"
       :width="100"
       :direction="direction"
       :movable="movable")
@@ -33,12 +35,15 @@ export default defineComponent({
   },
   setup() {
     const movable = ref(true)
+    const resizable = ref(false)
     const direction = ref('auto')
     const onClick = () => {
       direction.value = direction.value === 'x' ? 'y' : 'x'
+      resizable.value = !resizable.value
     }
     return {
       movable,
+      resizable,
       direction,
       onClick
     }

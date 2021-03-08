@@ -1,14 +1,14 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { Direction } from '../movable/props'
 
-export const useMousePosition = () => {
+export const useMousePosition = (scale: Ref<Number>) => {
   let callback
   const x = ref(0)
   const y = ref(0)
 
   const move = (e: MouseEvent) => {
-    x.value = e.pageX
-    y.value = e.pageY
+    x.value = e.pageX / scale.value
+    y.value = e.pageY / scale.value
     if (callback) {
       callback(e, x, y)
     }
@@ -31,8 +31,10 @@ export const useMousePosition = () => {
   }
 }
 
-export const useMouseMove = (tx, ty, movable: Ref, direction: string) => {
-  const { x, y, onMouseMove } = useMousePosition()
+export const useMouseMove = (
+  tx, ty, scale: Ref, movable: Ref, direction: string, stopPropagation = false
+  ) => {
+  const { x, y, onMouseMove } = useMousePosition(scale)
   const moveData = { x: 0, y: 0, moving: false }
 
   const cx = ref(tx)
@@ -43,12 +45,18 @@ export const useMouseMove = (tx, ty, movable: Ref, direction: string) => {
 
   function mouseDown (e: MouseEvent) {
     e?.target.setPointerCapture(e.pointerId)
+    if (e && stopPropagation) {
+      e.stopPropagation();
+    }
     moveData.moving = true
     moveData.x = x.value - cx.value
     moveData.y = y.value - cy.value
   }
   function mouseUp(e: MouseEvent) {
     e?.target.releasePointerCapture(e.pointerId)
+    if (e && stopPropagation) {
+      e.stopPropagation();
+    }
     moveData.moving = false
   }
   onMouseMove(() => {

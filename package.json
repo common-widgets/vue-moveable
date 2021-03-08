@@ -1,6 +1,6 @@
 {
   "name": "vue-movable-v3",
-  "version": "1.0.7",
+  "version": "1.0.11",
   "source": "src/components/movable/index.ts",
   "main": "dist/vue-movable-v3.umd.js",
   "module": "dist/vue-movable-v3.es.js",
