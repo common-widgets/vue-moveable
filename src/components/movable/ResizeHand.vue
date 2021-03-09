@@ -27,13 +27,14 @@ export default defineComponent({
   },
   emits: ['resize'],
   setup(props, { emit }) {
-    const scale = ref(props.scale)
     const { x, y, mouseDown, mouseUp, onMoving, onMoveEnd } = useMouseMove(
       0, 0,
-      scale, ref(true),
+      ref(props.scale), ref(true),
       props.direction, true)
 
-    const style = computed(() => { transform: `scale(${1/scale})` })
+    const style = computed(() => { 
+      return { transform: `scale(${1/props.scale})` }
+    })
 
     let cacheData = {
       width: 0,
@@ -88,7 +89,9 @@ export default defineComponent({
   top @left
   margin-left -(@width / 2)
   margin-top @margin-left
-  background teal
+  background #fff
+  box-shadow: 0 0 0px 2px #018d4c
+  // border 1px solid #03b0b0
   &[data-direction="e"]
     cursor e-resize
     left 100%

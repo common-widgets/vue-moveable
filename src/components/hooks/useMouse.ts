@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, watchEffect } from 'vue'
 import { Direction } from '../movable/props'
 
 export const useMousePosition = (scale: Ref<Number>) => {
@@ -42,6 +42,9 @@ export const useMouseMove = (
   const onMovingCallback = ref(null)
 
   watch(movable, () => mouseUp())
+  watchEffect(() => cx, () => {
+    console.log('tx', tx)
+  })
 
   function mouseDown (e: MouseEvent) {
     e?.target.setPointerCapture(e.pointerId)

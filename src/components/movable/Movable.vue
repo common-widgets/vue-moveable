@@ -5,21 +5,21 @@
   @pointerup="onMouseUp"
   @pointerleave="onMouseUp")
   .resize-wrapper(v-if="resizable")
-    ResizeHand(direction="nw" :width="width" :height="height" @resize="handResize")
-    ResizeHand(direction="n" :width="width" :height="height" @resize="handResize")
-    ResizeHand(direction="ne" :width="width" :height="height" @resize="handResize")
-    ResizeHand(direction="e" :width="width" :height="height" @resize="handResize")
-    ResizeHand(direction="se" :width="width" :height="height" @resize="handResize")
-    ResizeHand(direction="s" :width="width" :height="height" @resize="handResize")
-    ResizeHand(direction="sw" :width="width" :height="height" @resize="handResize")
-    ResizeHand(direction="w" :width="width" :height="height" @resize="handResize")
+    ResizeHand(direction="nw" :width="width" :height="height" @resize="handResize" :scale="scale")
+    ResizeHand(direction="n" :width="width" :height="height" @resize="handResize" :scale="scale")
+    ResizeHand(direction="ne" :width="width" :height="height" @resize="handResize" :scale="scale")
+    ResizeHand(direction="e" :width="width" :height="height" @resize="handResize" :scale="scale")
+    ResizeHand(direction="se" :width="width" :height="height" @resize="handResize" :scale="scale")
+    ResizeHand(direction="s" :width="width" :height="height" @resize="handResize" :scale="scale")
+    ResizeHand(direction="sw" :width="width" :height="height" @resize="handResize" :scale="scale")
+    ResizeHand(direction="w" :width="width" :height="height" @resize="handResize" :scale="scale")
   .movable-wrapper
     slot
 
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, computed, reactive, watchEffect } from 'vue'
+import { ref, defineComponent, computed, reactive, watch, watchEffect } from 'vue'
 import Props, { Direction } from './props'
 import { useMouseMove } from '../hooks/useMouse'
 import { useCount, getMaxCount } from '../hooks/useCount'
@@ -29,7 +29,7 @@ export default defineComponent({
   name: 'VueMovable',
   components: { ResizeHand },
   props: Props,
-  emits: ['resize'],
+  emits: ['resize', 'move'],
   setup: (props, { emit }) => {
     const movable = ref(props.movable)
     const scale = ref(props.scale)
@@ -59,12 +59,29 @@ export default defineComponent({
     onMoving(() => {
       opacity.value = 0.5
       zIndex.value = getMaxCount(1)
+      emit('move', x, y)
     })
     function onMouseUp(e: MouseEvent) {
       mouseUp()
       opacity.value = 1
       zIndex.value = defaultZIndex
     }
+    watch(() => props.x, () => {
+      if (!movable.value) return
+      x.value = props.x
+    })
+    watch(() => props.y, () => {
+      if (!movable.value) return
+      y.value = props.y
+    })
+    watch(() => props.width, () => {
+      if (!resizable.value) return
+      width.value = props.width
+    })
+    watch(() => props.height, () => {
+      if (!resizable.value) return
+      height.value = props.height
+    })
     watchEffect(() => {
       resizable.value = props.resizable
       scale.value = props.scale
@@ -78,6 +95,7 @@ export default defineComponent({
     }
     return {
       style,
+      scale,
       resizable,
       width, height,
       mouseDown, onMouseUp, handResize
@@ -87,6 +105,8 @@ export default defineComponent({
 </script>
 
 <style scoped lang="stylus">
+.resize-wrapper
+  z-index 1000
 .movable-container
   cursor pointer
   position absolute
@@ -95,7 +115,7 @@ export default defineComponent({
   width auto
   height auto
   touch-action: pan-x
-  border 1px solid teal
+  box-shadow: 0 0 1px rgb(0,0,0,.3)
 .movable-wrapper
   user-select none
   width 100%
