@@ -1,81 +1,68 @@
 <template lang="pug">
 .resize-handle(
+  ref="container"
   :data-direction="direction" 
-  :style="style"
-  @pointerdown="onMouseDown"
-  @pointerup="onMouseUp"
-  @pointerleave="onMouseUp")
+  :style="style")
 </template>
 
-<script lang="ts">
-import { defineComponent, computed, ref } from 'vue'
+<script lang="ts" setup>
+import { computed, ref, watch, defineProps, defineEmit } from 'vue'
 import { useMouseMove } from '../hooks/useMouse'
 
-export default defineComponent({
-  props: {
-    scale: {
-      type: Number,
-      default: 1
-    },
-    direction: String,
-    width: {
-      type: Number
-    },
-    height: {
-      type: Number
-    }
+const props = defineProps({
+  scale: {
+    type: Number,
+    default: 1
   },
-  emits: ['resize'],
-  setup(props, { emit }) {
-    const { x, y, mouseDown, mouseUp, onMoving, onMoveEnd } = useMouseMove(
-      0, 0,
-      ref(props.scale), ref(true),
-      props.direction, true)
+  direction: String,
+  width: {
+    type: Number
+  },
+  height: {
+    type: Number
+  }
+})
+const emit = defineEmit(['resize'])
+const container = ref(null)
+const { x, y, moving } = useMouseMove(
+  container,
+  0, 0,
+  ref(props.scale), ref(true),
+  ref(props.direction), true)
 
-    const style = computed(() => { 
-      return { transform: `scale(${1/props.scale})` }
+const style = computed(() => { 
+  return { transform: `scale(${1/props.scale})` }
+})
+
+let cacheData = {
+  width: props.width,
+  height: props.height
+}
+
+watch([moving], () => {
+  if (moving.value) {
+    let width = cacheData.width
+    let height = cacheData.height
+    if (['w', 'e'].includes(props.direction)) {
+      width += x.value
+    } else if (['s', 'n'].includes(props.direction)) {
+      height += y.value
+    } else if (['se', 'ne'].includes(props.direction)) {
+      const val = Math.min(x.value/width, y.value/height) + 1
+      width *= val
+      height *= val
+    }
+    emit('resize', {
+      x, y, direction: props.direction,
+      width, height
     })
-
-    let cacheData = {
-      width: 0,
-      height: 0
+  } else {
+    cacheData = {
+      width: props.width,
+      height: props.height
     }
-    
-    onMoving(() => {
-      let width = cacheData.width
-      let height = cacheData.height
-      if (['w', 'e'].includes(props.direction)) {
-        width += x.value
-      } else if (['s', 'n'].includes(props.direction)) {
-        height += y.value
-      } else if (['se', 'ne'].includes(props.direction)) {
-        const val = Math.min(x.value/width, y.value/height) + 1
-        width *= val
-        height *= val
-      }
-      emit('resize', {
-        x, y, direction: props.direction,
-        width, height
-      })
-    })
-    function onMouseDown(e: MouseEvent) {
-      mouseDown(e)
-      cacheData = {
-        width: props.width,
-        height: props.height
-      }
-    }
-    function onMouseUp(e: MouseEvent) {
-      mouseUp(e)
-      x.value = 0
-      y.value = 0
-    }
-
-    return {
-      direction: props.direction,
-      style,
-      onMouseDown, onMouseUp
-    }
+    x.value = 0
+    y.value = 0
   }
 })
 </script>

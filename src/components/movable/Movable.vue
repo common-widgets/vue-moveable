@@ -1,9 +1,7 @@
 <template lang="pug">
 .movable-container(
-  :style="style"
-  @pointerdown="mouseDown"
-  @pointerup="onMouseUp"
-  @pointerleave="onMouseUp")
+  ref="container"
+  :style="style")
   .resize-wrapper(v-if="resizable")
     ResizeHand(direction="nw" :width="width" :height="height" @resize="handResize" :scale="scale")
     ResizeHand(direction="n" :width="width" :height="height" @resize="handResize" :scale="scale")
@@ -19,8 +17,8 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, computed, reactive, watch, watchEffect } from 'vue'
-import Props, { Direction } from './props'
+import { ref, defineComponent, computed, watch, watchEffect } from 'vue'
+import Props from './props'
 import { useMouseMove } from '../hooks/useMouse'
 import { useCount, getMaxCount } from '../hooks/useCount'
 import ResizeHand from './ResizeHand.vue'
@@ -42,7 +40,10 @@ export default defineComponent({
     const zIndex = ref(defaultZIndex)
     const opacity = ref(1)
 
-    const { x, y, mouseDown, mouseUp, onMoving, onMoveEnd } = useMouseMove(
+    const container = ref(null)
+
+    const { x, y } = useMouseMove(
+      container,
       props.x, props.y,
       scale, movable,
       direction)
@@ -56,16 +57,6 @@ export default defineComponent({
         transform: `translate3d(${x.value}px, ${y.value}px, 0)`
       }
     })
-    onMoving(() => {
-      opacity.value = 0.5
-      zIndex.value = getMaxCount(1)
-      emit('move', x, y)
-    })
-    function onMouseUp(e: MouseEvent) {
-      mouseUp()
-      opacity.value = 1
-      zIndex.value = defaultZIndex
-    }
     watch(() => props.x, () => {
       if (!movable.value) return
       x.value = props.x
@@ -94,11 +85,12 @@ export default defineComponent({
       emit('resize', width, height)
     }
     return {
+      container,
       style,
       scale,
       resizable,
       width, height,
-      mouseDown, onMouseUp, handResize
+      handResize
     }
   }
 })

@@ -34,13 +34,13 @@
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted } from 'vue'
 import Movable from './components/movable/Movable.vue'
-import MovableT from 'vue-movable-v3/vue-movable-v3.es.js'
-import 'vue-movable-v3/style.css'
+// import MovableT from 'vue-movable-v3/vue-movable-v3.es.js'
+// import 'vue-movable-v3/style.css'
 
 export default defineComponent({
   name: 'App',
   components: {
-    Movable, MovableT
+    Movable
   },
   setup() {
     const movable = ref(true)
@@ -60,12 +60,6 @@ export default defineComponent({
       return {
         transform: `scale(${scale.value})`
       }
-    })
-
-    onMounted(() => {
-      document.addEventListener('click', () => {
-        resizable.value = false
-      })
     })
 
     function onMove(mx, my) {

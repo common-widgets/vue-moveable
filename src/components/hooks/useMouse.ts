@@ -1,17 +1,14 @@
-import { ref, onMounted, onUnmounted, watch, watchEffect } from 'vue'
-import { Direction } from '../movable/props'
+import { Ref, ref, onMounted, onUnmounted, watch } from 'vue'
 
-export const useMousePosition = (scale: Ref<Number>) => {
-  let callback
+export const useMousePosition = (scale: Ref<number>) => {
+  const moving = ref(false)
   const x = ref(0)
   const y = ref(0)
 
   const move = (e: MouseEvent) => {
     x.value = e.pageX / scale.value
     y.value = e.pageY / scale.value
-    if (callback) {
-      callback(e, x, y)
-    }
+    moving.value = true
   }
 
   onMounted(() => {
@@ -22,48 +19,48 @@ export const useMousePosition = (scale: Ref<Number>) => {
     window.removeEventListener('mousemove', move)
   })
 
-  function onMouseMove(cb) {
-    callback = cb
-  }
-
   return {
-    x, y, onMouseMove
+    x, y, moving
   }
 }
 
 export const useMouseMove = (
-  tx, ty, scale: Ref, movable: Ref, direction: string, stopPropagation = false
+  el: Ref<HTMLElement>,
+  tx, ty, scale: Ref, movable: Ref, direction: Ref<string>, stopPropagation = false
   ) => {
-  const { x, y, onMouseMove } = useMousePosition(scale)
-  const moveData = { x: 0, y: 0, moving: false }
+  const { x, y } = useMousePosition(scale)
+  const moving = ref(false)
+  const moveData = { x: 0, y: 0 }
 
   const cx = ref(tx)
   const cy = ref(ty)
   const onMovingCallback = ref(null)
 
-  watch(movable, () => mouseUp())
-  watchEffect(() => cx, () => {
-    console.log('tx', tx)
+  watch(movable, () => pointerUp())
+
+  onMounted(() => {
+    el.value?.addEventListener("pointerdown", pointerDown)
+    el.value?.addEventListener("pointermove", pointerMove)
+    el.value?.addEventListener("pointerup", pointerUp)
+  })
+  onUnmounted(() => {
+    el.value?.removeEventListener("pointerdown", pointerDown)
+    el.value?.removeEventListener("pointermove", pointerMove)
+    el.value?.removeEventListener("pointerup", pointerUp)
   })
 
-  function mouseDown (e: MouseEvent) {
-    e?.target.setPointerCapture(e.pointerId)
+  function pointerDown(e: PointerEvent) {
+    const target = e?.target as HTMLElement
+    target?.setPointerCapture(e.pointerId)
     if (e && stopPropagation) {
       e.stopPropagation();
     }
-    moveData.moving = true
+    moving.value = true
     moveData.x = x.value - cx.value
     moveData.y = y.value - cy.value
-  }
-  function mouseUp(e: MouseEvent) {
-    e?.target.releasePointerCapture(e.pointerId)
-    if (e && stopPropagation) {
-      e.stopPropagation();
-    }
-    moveData.moving = false
-  }
-  onMouseMove(() => {
-    if (!moveData.moving || !movable.value) return
+  } 
+  function pointerMove(e: PointerEvent) {
+    if (!moving.value) return
 
     onMovingCallback.value && onMovingCallback.value()
 
@@ -75,10 +72,15 @@ export const useMouseMove = (
       cx.value = x.value - moveData.x
       cy.value = y.value - moveData.y
     }
-  })
-  function onMoving(cb: () => void) {
-    onMovingCallback.value = cb
-  }
+  } 
+  function pointerUp(e?: PointerEvent) {
+    const target = e?.target as HTMLElement
+    target?.releasePointerCapture(e.pointerId)
+    if (e && stopPropagation) {
+      e.stopPropagation();
+    }
+    moving.value = false
+  } 
 
-  return { x: cx, y: cy, mouseDown, mouseUp, onMoving }
+  return { x: cx, y: cy, moving }
 }
